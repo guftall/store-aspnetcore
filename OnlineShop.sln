@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineShopV1", "OnlineShopV1\OnlineShopV1.csproj", "{E7CA7259-8B89-48D6-ACBE-EA8C209DD0EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestV1", "TestV1\TestV1.csproj", "{1EDF71C8-FE3A-4E46-B4FB-71F45B366519}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E7CA7259-8B89-48D6-ACBE-EA8C209DD0EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7CA7259-8B89-48D6-ACBE-EA8C209DD0EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7CA7259-8B89-48D6-ACBE-EA8C209DD0EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7CA7259-8B89-48D6-ACBE-EA8C209DD0EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EDF71C8-FE3A-4E46-B4FB-71F45B366519}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EDF71C8-FE3A-4E46-B4FB-71F45B366519}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EDF71C8-FE3A-4E46-B4FB-71F45B366519}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EDF71C8-FE3A-4E46-B4FB-71F45B366519}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
