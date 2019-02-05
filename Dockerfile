@@ -25,7 +25,7 @@ FROM test AS publish
 WORKDIR /app/OnlineShopV1
 RUN dotnet publish -o out
 
-FROM microsoft/dotnet:2.2-runtime AS runtime
+FROM microsoft/dotnet:2.2-aspnetcore-runtime AS runtime
 WORKDIR /app
 COPY --from=publish /app/OnlineShopV1/out ./
 ENTRYPOINT ["dotnet", "OnlineShopV1.dll"]
