@@ -5,6 +5,7 @@ WORKDIR /app
 COPY *.sln .
 COPY OnlineShopV1/*.csproj ./OnlineShopV1/
 COPY TestV1/*.csproj ./TestV1/
+COPY entrypoint.sh ./
 RUN dotnet restore
 
 # copy and build everything else
@@ -28,4 +29,7 @@ RUN dotnet publish -o out
 FROM microsoft/dotnet:2.2-aspnetcore-runtime AS runtime
 WORKDIR /app
 COPY --from=publish /app/OnlineShopV1/out ./
-ENTRYPOINT ["dotnet", "OnlineShopV1.dll"]
+COPY --from=build /app/entrypoint.sh ./
+
+RUN chmod +x ./entrypoint.sh
+ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
