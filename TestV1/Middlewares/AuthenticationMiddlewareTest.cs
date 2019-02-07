@@ -30,7 +30,7 @@ namespace TestV1
 
             context.Response.Body = new MemoryStream();
 
-            await middleware.InvokeAsync(context, mockRepo.Object);
+            await middleware.Invoke(context, mockRepo.Object, null);
 
 
             context.Response.Body.Seek(0, SeekOrigin.Begin);
@@ -53,7 +53,7 @@ namespace TestV1
             context.Response.Body = new MemoryStream();
             context.Request.Headers["authCode"] = "some_random_string";
 
-            await middleware.InvokeAsync(context, mockRepo.Object);
+            await middleware.Invoke(context, mockRepo.Object, null);
 
 
             context.Response.Body.Seek(0, SeekOrigin.Begin);
@@ -83,7 +83,7 @@ namespace TestV1
             context.Response.Body = new MemoryStream();
             context.Request.Headers["authCode"] = authCode;
 
-            await middleware.InvokeAsync(context, mockRepo.Object);
+            await middleware.Invoke(context, mockRepo.Object, null);
 
 
             context.Response.Body.Seek(0, SeekOrigin.Begin);
@@ -96,11 +96,12 @@ namespace TestV1
         
         
         [Fact]
-        public async Task ValidAuthentication_PassRequestToNextRDInPipeline()
+        public async Task ValidAuthentication_PopulateAuth_PassRequestToNextRDInPipeline()
         {
 
             var auth = AuthenticationTest.GetTestAuth();
             auth.Code = authCode;
+            auth.UserType = UserType.Normal;
             auth.Expires = DateTime.Now.Add(TimeSpan.FromDays(1));
             const int customStatusCode = 123;
             
@@ -119,9 +120,48 @@ namespace TestV1
             context.Response.Body = new MemoryStream();
             context.Request.Headers["authCode"] = authCode;
 
-            await middleware.InvokeAsync(context, mockRepo.Object);
+            await middleware.Invoke(context, mockRepo.Object, null);
 
             Assert.Equal(customStatusCode, context.Response.StatusCode);
+            Assert.Equal(auth, context.Items["auth"] as Authentication);
+        }
+
+        [Fact]
+        public async Task ValidAuthentication_PopulateAdminFromDb_ContinuePipeline()
+        {
+
+            var auth = AuthenticationTest.GetTestAuth();
+            auth.Code = authCode;
+            auth.UserType = UserType.Admin;
+            auth.Expires = DateTime.Now.Add(TimeSpan.FromDays(1));
+            const int customStatusCode = 123;
+            
+            var mockRepo = new Mock<IAuthenticationRepository>();
+            mockRepo.Setup(r => r.GetByCode(authCode))
+                .ReturnsAsync(auth);
+            
+            AdminControllerTest.Init();
+            auth.Username = AdminControllerTest.tmpAdmin.Username;
+            
+            var mockAdminRepo = new Mock<IAdminRepository>();
+            mockAdminRepo.Setup(r => r.GetByUsername(auth.Username))
+                .ReturnsAsync(AdminControllerTest.tmpAdmin);
+            
+            var context = new DefaultHttpContext();
+            
+            var middleware = new AuthenticationMiddleware(httpContext =>
+            {
+                httpContext.Response.StatusCode = customStatusCode;
+                return Task.CompletedTask;
+            });
+
+            context.Response.Body = new MemoryStream();
+            context.Request.Headers["authCode"] = authCode;
+
+            await middleware.Invoke(context, mockRepo.Object, mockAdminRepo.Object);
+
+            Assert.Equal(customStatusCode, context.Response.StatusCode);
+            Assert.Equal(AdminControllerTest.tmpAdmin, context.Items["admin"] as Admin);
         }
     }
 }

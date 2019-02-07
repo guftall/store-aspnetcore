@@ -1,7 +1,5 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using OnlineShopV1.Core.Interfaces;
 using OnlineShopV1.Core.Responses;
@@ -10,8 +8,6 @@ namespace OnlineShopV1.Controllers
 {
     public class AdminController : ControllerBase
     {
-
-
         private readonly IOptionsMonitor<GlobalOptions> _options;
         private readonly IAuthenticationRepository _authRepo;
         private readonly IAdminRepository _adminRepo;
@@ -28,7 +24,6 @@ namespace OnlineShopV1.Controllers
 
         public async Task<ActionResult<LoginResponse>> Login([FromBody] Admin tmpAdmin)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(new MBadRequest(ModelState));
@@ -64,6 +59,18 @@ namespace OnlineShopV1.Controllers
             }
 
             return Ok(new LoginResponse(auth.Code));
+        }
+
+//        [MiddlewareFilter(typeof(AuthenticationMiddleware))]
+        [HttpPost("logout")]
+        public async Task<ActionResult<Response>> Logout()
+        {
+
+            var auth = HttpContext.Items["auth"] as Authentication;
+            
+            await _authRepo.Remove(auth);
+
+            return Ok(new DefaultResponse());
         }
     }
 }

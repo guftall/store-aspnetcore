@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -8,17 +10,18 @@ using OnlineShopV1.Controllers;
 using OnlineShopV1.Core.Interfaces;
 using OnlineShopV1.Core.Responses;
 using Xunit;
+using StatusCodes = OnlineShopV1.Core.Responses.StatusCodes;
 
 namespace TestV1
 {
     public class AdminControllerTest
     {
 
-        private Mock<IAuthenticationRepository> authRepo;
-        private Mock<IAdminRepository> adminRepo;
-        private Mock<IOptionsMonitor<GlobalOptions>> opts;
-        private Admin tmpAdmin;
-        private const string AuthCode = "some_random_auth_code";
+        public static Mock<IAuthenticationRepository> authRepo;
+        public static  Mock<IAdminRepository> adminRepo;
+        public static  Mock<IOptionsMonitor<GlobalOptions>> opts;
+        public static  Admin tmpAdmin;
+        public static string AuthCode = "some_random_auth_code";
 
         [Fact]
         public async Task LoginAdminNotFoundUsername_ReturnUnAuthorized()
@@ -163,13 +166,40 @@ namespace TestV1
             Assert.Equal(tmpAuth.Code, response.AuthCode);
         }
 
+        [Fact]
+        public async Task LogoutSuccess_ReturnLoggedOutResponse()
+        {
+            Init();
+
+            var controller = GetController();
+
+            var tmpAuth = new Authentication
+            {
+                ID = tmpAdmin.ID,
+                Username = tmpAdmin.Username
+            };
+
+            authRepo.Setup(r => r.Remove(tmpAuth))
+                .Returns(Task.CompletedTask);
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.HttpContext.Items.Add("admin", tmpAdmin);
+
+            var actionResult = await controller.Logout();
+            
+            var objectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
+            var response = Assert.IsType<DefaultResponse>(objectResult.Value);
+            
+            Assert.Equal(Microsoft.AspNetCore.Http.StatusCodes.Status200OK, objectResult.StatusCode);
+            Assert.Equal((int) StatusCodes.Success, response.status);
+        }
 
         private AdminController GetController()
         {
             return new AdminController(authRepo.Object, adminRepo.Object, opts.Object);
         }
 
-        private void Init()
+        public static void Init()
         {
             
             authRepo = new Mock<IAuthenticationRepository>();

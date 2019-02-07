@@ -14,7 +14,6 @@ namespace TestV1.Models
                 Code = "some_random_string",
                 Expires = DateTime.Now,
                 Username = "omid",
-                UserType = UserType.Admin,
                 ID = 1
             };
 

@@ -33,5 +33,11 @@ namespace OnlineShopV1.DAL
             _context.Authentications.Update(authentication);
             return _context.SaveChangesAsync();
         }
+
+        public Task Remove(Authentication auth)
+        {
+            _context.Authentications.Remove(auth);
+            return _context.SaveChangesAsync();
+        }
     }
 }

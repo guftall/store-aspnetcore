@@ -19,7 +19,9 @@ namespace OnlineShopV1.Middlewares
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, IAuthenticationRepository _repository)
+        public async Task Invoke(HttpContext context,
+            IAuthenticationRepository _repository,
+            IAdminRepository adminRepo)
         {
             IResponse result;
             string authHeader = context.Request.Headers["authCode"];
@@ -32,7 +34,18 @@ namespace OnlineShopV1.Middlewares
             }
             else if (!auth.IsExpired())
             {
-                await _next(context);
+                context.Items.Add("auth", auth);
+                /* attach admin user for use in actions
+                 *
+                 * this can be done in `Logout` and `Profile` actions only, to improve performance, but for now
+                 * take it easy (:
+                 * */
+                if (auth.UserType == UserType.Admin)
+                {
+                    var admin = await adminRepo.GetByUsername(auth.Username);
+                    context.Items.Add("admin", admin);
+                }
+                await _next.Invoke(context);
                 return;
             }
             else

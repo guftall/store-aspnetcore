@@ -8,5 +8,6 @@ namespace OnlineShopV1.Core.Interfaces
         Task<Authentication> GetByUsername(string username);
         Task AddAuthentication(Authentication authentication);
         Task UpdateAuthentication(Authentication authentication);
+        Task Remove(Authentication auth);
     }
 }
