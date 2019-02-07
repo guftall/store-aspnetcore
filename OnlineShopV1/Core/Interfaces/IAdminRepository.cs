@@ -6,5 +6,6 @@ namespace OnlineShopV1.Core.Interfaces
     {
         Task<Admin> GetByUsername(string username);
         Task<Admin> GetByID(int id);
+        Task Update(Admin admin);
     }
 }

@@ -18,6 +18,7 @@ namespace OnlineShopV1.Core.Responses
         protected void SetStatus(StatusCodes statusCode)
         {
             status = (int) statusCode;
+
             message = StatusString(statusCode);
         }
 
@@ -29,7 +30,6 @@ namespace OnlineShopV1.Core.Responses
                 case StatusCodes.Success:
                     return "با موفقیت انجام شد";
                 case StatusCodes.BadRequest:
-                    return "داده دریافت شده نامعتبر است";
                 case StatusCodes.NotFound:
                     return "محتوا پیدا نشد";
                 case StatusCodes.InternalError:
@@ -38,6 +38,8 @@ namespace OnlineShopV1.Core.Responses
                 case StatusCodes.NotAuthorized:
                 case StatusCodes.AuthenticationExpired:
                     return "عدم تایید هویت";
+                case StatusCodes.MissMatchPassword:
+                    return "رمز قدیمی وارد شده اشتباه است";
                 default:
                     return "متن پیام نامشخص است";
                 // ReSharper restore StringLiteralTypo
@@ -49,6 +51,9 @@ namespace OnlineShopV1.Core.Responses
     public class DefaultResponse : Response
     {
         public DefaultResponse(): base(StatusCodes.Success)
+        {
+        }
+        public DefaultResponse(StatusCodes statusCodes): base(statusCodes)
         {
         }
     }
@@ -144,13 +149,14 @@ namespace OnlineShopV1.Core.Responses
             
         }
     }
-    
+
 
 
     public enum StatusCodes
     {
         Success=200,
         BadRequest=400,
+        MissMatchPassword=4001,
         NotAuthorized=401,
         AuthenticationFailed=4011,
         AuthenticationExpired=4012,

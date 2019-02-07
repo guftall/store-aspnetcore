@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
 using OnlineShopV1;
@@ -12,6 +11,7 @@ using OnlineShopV1.Middlewares;
 using TestV1.Models;
 using Xunit;
 using StatusCodes = OnlineShopV1.Core.Responses.StatusCodes;
+using TestV1.Controllers;
 
 namespace TestV1
 {

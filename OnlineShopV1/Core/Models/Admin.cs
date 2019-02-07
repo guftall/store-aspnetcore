@@ -14,6 +14,7 @@ namespace OnlineShopV1
         public String Username { get; set; }
 
         [MinLength(5)]
+        [Required]
         public String Password { get; set; }
         
         [DataType(DataType.DateTime)]

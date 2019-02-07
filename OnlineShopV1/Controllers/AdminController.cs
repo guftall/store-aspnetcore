@@ -1,3 +1,5 @@
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -61,7 +63,6 @@ namespace OnlineShopV1.Controllers
             return Ok(new LoginResponse(auth.Code));
         }
 
-//        [MiddlewareFilter(typeof(AuthenticationMiddleware))]
         [HttpPost("logout")]
         public async Task<ActionResult<Response>> Logout()
         {
@@ -72,5 +73,42 @@ namespace OnlineShopV1.Controllers
 
             return Ok(new DefaultResponse());
         }
+
+        [HttpPost("change-pass")]
+        public async Task<ActionResult<Response>> ChangePassword([FromBody] ChangePasswordRequest chPassReq)
+        {
+
+            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new MBadRequest(ModelState));
+            }
+
+            var admin = HttpContext.Items["admin"] as Admin;
+
+            if (!admin.VerifyPassword(chPassReq.OldPassword))
+            {
+                return BadRequest(new DefaultResponse(StatusCodes.MissMatchPassword));
+            }
+
+            admin.Password = chPassReq.NewPassword;
+            admin.HashPassword();
+
+            await _adminRepo.Update(admin);
+            
+            return Ok(new DefaultResponse());
+        }
+    }
+
+
+    public class ChangePasswordRequest
+    {
+        [MinLength(5)]
+        [Required]
+        public String OldPassword { get; set; }
+        
+        [Required]
+        [MinLength(5)]
+        public String NewPassword { get; set; }
     }
 }

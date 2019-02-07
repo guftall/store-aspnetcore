@@ -21,5 +21,11 @@ namespace OnlineShopV1.DAL
         {
             return _context.Admins.SingleOrDefaultAsync(a => a.ID == id);
         }
+
+        public Task Update(Admin admin)
+        {
+            _context.Admins.Update(admin);
+            return _context.SaveChangesAsync();
+        }
     }
 }

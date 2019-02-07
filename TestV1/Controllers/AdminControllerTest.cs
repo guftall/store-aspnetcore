@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +11,7 @@ using OnlineShopV1.Core.Responses;
 using Xunit;
 using StatusCodes = OnlineShopV1.Core.Responses.StatusCodes;
 
-namespace TestV1
+namespace TestV1.Controllers
 {
     public class AdminControllerTest
     {
@@ -194,12 +193,107 @@ namespace TestV1
             Assert.Equal((int) StatusCodes.Success, response.status);
         }
 
-        private AdminController GetController()
+        [Fact]
+        public async Task ChangePassword_InvalidNewPassword_ReturnFailed()
+        {
+            Init();
+
+            var controller = GetController();
+
+            var oldPass = "_" + tmpAdmin.Password;
+            const string newPass = "12";
+            tmpAdmin.HashPassword();
+
+            var chPassReq = new ChangePasswordRequest
+            {
+                OldPassword = oldPass,
+                NewPassword = newPass
+            };
+
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ModelState.AddModelError("newPassword", "password length must be greater than N");
+
+            var actionResult = await controller.ChangePassword(chPassReq);
+            
+            var objectResult = Assert.IsType<BadRequestObjectResult>(actionResult.Result);
+            var response = Assert.IsType<MBadRequest>(objectResult.Value);
+            
+            Assert.Equal(Microsoft.AspNetCore.Http.StatusCodes.Status400BadRequest, objectResult.StatusCode);
+            Assert.Equal((int) StatusCodes.BadRequest, response.status);
+            Assert.Equal("newPassword", response.Errors[0].Field);
+        }
+
+        [Fact]
+        public async Task ChangePassword_WrongOldPassword_ReturnFailed()
+        {
+            Init();
+
+            var controller = GetController();
+
+            var oldPass = "_" + tmpAdmin.Password;
+            const string newPass = "__123";
+            tmpAdmin.HashPassword();
+
+            var chPassReq = new ChangePasswordRequest
+            {
+                OldPassword = oldPass,
+                NewPassword = newPass
+            };
+
+            adminRepo.Setup(r => r.GetByUsername(tmpAdmin.Username))
+                .ReturnsAsync(tmpAdmin);
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.HttpContext.Items.Add("admin", tmpAdmin);
+
+            var actionResult = await controller.ChangePassword(chPassReq);
+            
+            var objectResult = Assert.IsType<BadRequestObjectResult>(actionResult.Result);
+            var response = Assert.IsType<DefaultResponse>(objectResult.Value);
+            
+            Assert.Equal(Microsoft.AspNetCore.Http.StatusCodes.Status400BadRequest, objectResult.StatusCode);
+            Assert.Equal((int) StatusCodes.MissMatchPassword, response.status);
+        }
+
+        [Fact]
+        public async Task ChangePassword_ReturnSuccess()
+        {
+            Init();
+
+            var controller = GetController();
+
+            var oldPass = tmpAdmin.Password;
+            const string newPass = "__123";
+            tmpAdmin.HashPassword();
+
+            var chPassReq = new ChangePasswordRequest
+            {
+                OldPassword = oldPass,
+                NewPassword = newPass
+            };
+
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.HttpContext.Items.Add("admin", tmpAdmin);
+
+            var actionResult = await controller.ChangePassword(chPassReq);
+            
+            var objectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
+            var response = Assert.IsType<DefaultResponse>(objectResult.Value);
+            
+            
+            Assert.True(tmpAdmin.VerifyPassword(newPass));
+            Assert.Equal(Microsoft.AspNetCore.Http.StatusCodes.Status200OK, objectResult.StatusCode);
+            Assert.Equal((int) StatusCodes.Success, response.status);
+            
+        }
+
+        private static AdminController GetController()
         {
             return new AdminController(authRepo.Object, adminRepo.Object, opts.Object);
         }
 
-        public static void Init()
+        public static bool Init()
         {
             
             authRepo = new Mock<IAuthenticationRepository>();
@@ -214,6 +308,7 @@ namespace TestV1
                 Username = "omidd",
                 Password = "12345"
             };
+            return true;
         }
     }
 }
