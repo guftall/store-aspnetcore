@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using OnlineShopV1;
 using OnlineShopV1.Controllers;
-using OnlineShopV1.Core.Interfaces;
 using OnlineShopV1.Core.Responses;
 using Xunit;
 using StatusCodes = OnlineShopV1.Core.Responses.StatusCodes;

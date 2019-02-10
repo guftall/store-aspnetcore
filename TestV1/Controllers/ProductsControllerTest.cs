@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using OnlineShopV1;
 using OnlineShopV1.Controllers;
-using OnlineShopV1.Core.Interfaces;
 using OnlineShopV1.Core.Responses;
 using OnlineShopV1.DAL;
 using Xunit;

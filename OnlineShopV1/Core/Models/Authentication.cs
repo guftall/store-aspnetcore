@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using MySql.Data.EntityFrameworkCore.DataAnnotations;
 using OnlineShopV1.Core;
 
@@ -38,5 +39,15 @@ namespace OnlineShopV1
         {
             Expires = DateTime.Now.Add(TimeSpan.FromHours(hours));
         }
+    }
+    
+    
+    public interface IAuthenticationRepository
+    {
+        Task<Authentication> GetByCode(string code);
+        Task<Authentication> GetByUsername(string username);
+        Task AddAuthentication(Authentication authentication);
+        Task UpdateAuthentication(Authentication authentication);
+        Task Remove(Authentication auth);
     }
 }

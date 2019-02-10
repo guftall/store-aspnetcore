@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using OnlineShopV1.Core;
 using Xunit;
 

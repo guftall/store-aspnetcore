@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Newtonsoft.Json;
 using OnlineShopV1;
-using OnlineShopV1.Core.Interfaces;
 using OnlineShopV1.Core.Responses;
 using OnlineShopV1.Middlewares;
 using TestV1.Models;

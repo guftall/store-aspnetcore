@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
 namespace OnlineShopV1
@@ -40,4 +41,13 @@ namespace OnlineShopV1
             LastLogin = DateTime.Now;
         }
     }
+    
+    
+    public interface IAdminRepository
+    {
+        Task<Admin> GetByUsername(string username);
+        Task<Admin> GetByID(int id);
+        Task Update(Admin admin);
+    }
+    
 }
