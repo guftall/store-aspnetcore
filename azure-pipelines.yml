@@ -13,5 +13,13 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build --configuration $(buildConfiguration)
+- script: |
+    dotnet build --configuration $(buildConfiguration)
+    dotnet test TestV1 --configuration $(buildConfiguration) --logger trx
   displayName: 'dotnet build $(buildConfiguration)'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
